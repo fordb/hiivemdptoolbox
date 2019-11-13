@@ -1157,13 +1157,15 @@ class QLearning(MDP):
             # current state is updated
             s = s_new
 
-            self.alpha *= self.alpha_decay
-            if self.alpha < self.alpha_min:
-                self.alpha = self.alpha_min
+            # only update these when q value is updated
+            if dQ > 0:
+                self.alpha *= self.alpha_decay
+                if self.alpha < self.alpha_min:
+                    self.alpha = self.alpha_min
 
-            self.epsilon *= self.epsilon_decay
-            if self.epsilon < self.epsilon_min:
-                self.epsilon = self.epsilon_min
+                self.epsilon *= self.epsilon_decay
+                if self.epsilon < self.epsilon_min:
+                    self.epsilon = self.epsilon_min
 
             if n % 1000 == 0:
                 print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tError:{er}\tTotal Reward:{r}'.format(n=n, a=round(self.alpha, 2), e=round(self.epsilon, 2), er=round(self.mean_discrepancy[-1], 2),
