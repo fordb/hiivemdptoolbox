@@ -1164,7 +1164,7 @@ class QLearning(MDP):
                     self.epsilon = self.epsilon_min
 
             if n % 1000 == 0:
-                print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tAvg Delta:{d}\tTotal Reward:{r}'.format(n=n, a=round(self.alpha, 2), e=round(self.epsilon, 2), d=round(np.mean(self.deltas[-1000:]), 2),
+                print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tAvg Delta:{d}\tTotal Reward:{r}'.format(n=n, a=round(self.alpha, 2), e=round(self.epsilon, 2), d=round(_np.mean(self.deltas[-1000:]), 2),
                                                                                            r=self.cum_reward))
 
         self._endRun()
