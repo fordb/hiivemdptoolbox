@@ -1077,6 +1077,7 @@ class QLearning(MDP):
         self.Q = _np.zeros((self.S, self.A))
         self.mean_discrepancy = []
         self.run_stats = []
+        self.cum_reward = 0
 
     def run(self):
 
@@ -1121,6 +1122,8 @@ class QLearning(MDP):
                 except IndexError:
                     r = self.R[s]
 
+            self.cum_reward += r
+
             # Q[s, a] = Q[s, a] + alpha*(R + gamma*Max[Q(s’, A)] - Q[s, a])
             # Updating the value of Q
             dQ = self.alpha * (r + self.gamma * self.Q[s_new, :].max() - self.Q[s, a])
@@ -1161,6 +1164,10 @@ class QLearning(MDP):
             self.epsilon *= self.epsilon_decay
             if self.epsilon < self.epsilon_min:
                 self.epsilon = self.epsilon_min
+
+            if n % 1000 == 0:
+                print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tError:{er}\tTotal Reward:{r}'.format(n=n, a=round(self.alpha, 2), e=round(self.epsilon, 2), er=round(self.mean_discrepancy[-1], 2),
+                                                                                           r=self.cum_reward))
 
         self._endRun()
         return self.run_stats
