@@ -1046,7 +1046,7 @@ class QLearning(MDP):
     def __init__(self, transitions, reward, gamma,
                  alpha=0.1, alpha_decay=0.99, alpha_min=0.1,
                  epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.99,
-                 n_iter=10000, skip_check=False):
+                 n_iter=10000, seed=100, skip_check=False):
         # Initialise a Q-learning MDP.
 
         # The following check won't be done in MDP()'s initialisation, so let's
@@ -1062,8 +1062,10 @@ class QLearning(MDP):
         # Store P, S, and A
         self.S, self.A = _computeDimensions(transitions)
         self.P = self._computeTransition(transitions)
-
         self.R = reward
+
+        # set np seed
+        _np.random.seed(seed)
 
         self.alpha = _np.clip(alpha, 0., 1.)
         self.alpha_decay = _np.clip(alpha_decay, 0., 1.)
