@@ -1075,7 +1075,6 @@ class QLearning(MDP):
 
         # Initialisations
         self.Q = _np.zeros((self.S, self.A))
-        self.mean_discrepancy = []
         self.run_stats = []
         self.cum_reward = 0
 
@@ -1084,7 +1083,7 @@ class QLearning(MDP):
         # Run the Q-learning algorithm.
         discrepancy = []
         self.run_stats = []
-        self.mean_discrepancy = []
+        self.deltas = []
 
         self.time = _time.time()
 
@@ -1130,14 +1129,10 @@ class QLearning(MDP):
 
             self.Q[s, a] = self.Q[s, a] + dQ
 
-            # Computing and saving maximal values of the Q variation
-            error = _np.absolute(dQ)
-            discrepancy.append(error)
-
-            # Computing means all over maximal Q variations values
-            if len(discrepancy) == 100:
-                self.mean_discrepancy.append(_np.mean(discrepancy))
-                discrepancy = []
+            # Computing and saving Q value variation
+            delta = _np.sum(_np.absolute(dQ))
+            if delta > 0:
+                self.deltas.append(delta)
 
             # compute the value function and the policy
             v = self.Q.max(axis=1)
@@ -1168,7 +1163,7 @@ class QLearning(MDP):
                     self.epsilon = self.epsilon_min
 
             if n % 1000 == 0:
-                print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tError:{er}\tTotal Reward:{r}'.format(n=n, a=round(self.alpha, 2), e=round(self.epsilon, 2), er=round(self.mean_discrepancy[-1], 2),
+                print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tAvg Delta:{d}\tTotal Reward:{r}'.format(n=n, a=round(self.alpha, 2), e=round(self.epsilon, 2), d=round(np.mean(self.deltas[-1000:]), 2),
                                                                                            r=self.cum_reward))
 
         self._endRun()
