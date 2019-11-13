@@ -1130,6 +1130,7 @@ class QLearning(MDP):
             self.Q[s, a] = self.Q[s, a] + dQ
 
             # Computing and saving Q value variation
+            error = _np.absolute(dQ)
             delta = _np.sum(_np.absolute(dQ))
             if delta > 0:
                 self.deltas.append(delta)
