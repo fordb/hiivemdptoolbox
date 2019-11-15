@@ -1169,7 +1169,7 @@ class QLearning(MDP):
             if n % 1000 == 0 and self.verbose:
                 print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tAvg Delta:{d}\tMoving Sum Reward:{r}'.format(n=n, a=round(self.alpha, 5), e=round(self.epsilon, 5),
                                                                                                    d=round(_np.mean(self.deltas[-10000:]), 5),
-                                                                                                   r=round(_np.sum(self.rewards[-10000:])))
+                                                                                                   r=round(_np.sum(self.rewards[-10000:]))))
 
         self._endRun()
         return self.run_stats
