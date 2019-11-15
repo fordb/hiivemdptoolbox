@@ -1046,7 +1046,7 @@ class QLearning(MDP):
     def __init__(self, transitions, reward, gamma,
                  alpha=0.1, alpha_decay=0.99, alpha_min=0.1,
                  epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.99,
-                 n_iter=10000, seed=100, skip_check=False, verbose=False):
+                 n_iter=10000, seed=100, reinitialization=100, skip_check=False, verbose=False):
         # Initialise a Q-learning MDP.
 
         # The following check won't be done in MDP()'s initialisation, so let's
@@ -1074,6 +1074,7 @@ class QLearning(MDP):
         self.epsilon = _np.clip(epsilon, 0., 1.)
         self.epsilon_decay = _np.clip(epsilon_decay, 0., 1.)
         self.epsilon_min = _np.clip(epsilon_min, 0., 1.)
+        self.reinitialization = reinitialization
         self.verbose = verbose
 
         # Initialisations
@@ -1096,7 +1097,7 @@ class QLearning(MDP):
         for n in range(1, self.max_iter + 1):
 
             # Reinitialisation of trajectories every 100 transitions
-            if (n % 100) == 0:
+            if (n % self.reinitialization) == 0:
                 s = _np.random.randint(0, self.S)
 
             # Action choice : greedy with increasing probability
@@ -1170,6 +1171,10 @@ class QLearning(MDP):
                 print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tAvg Delta:{d}\tMoving Sum Reward:{r}'.format(n=n, a=round(self.alpha, 5), e=round(self.epsilon, 5),
                                                                                                    d=round(_np.mean(self.deltas[-10000:]), 5),
                                                                                                    r=round(_np.sum(self.rewards[-10000:]))))
+            # reset rewards list to save memory
+            if n % 10000 == 0:
+                self.rewards = []
+                
 
         self._endRun()
         return self.run_stats
