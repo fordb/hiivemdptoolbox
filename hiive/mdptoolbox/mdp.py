@@ -1046,7 +1046,7 @@ class QLearning(MDP):
     def __init__(self, transitions, reward, gamma,
                  alpha=0.1, alpha_decay=0.99, alpha_min=0.1,
                  epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.99,
-                 n_iter=10000, seed=100, skip_check=False):
+                 n_iter=10000, seed=100, skip_check=False, verbose=False):
         # Initialise a Q-learning MDP.
 
         # The following check won't be done in MDP()'s initialisation, so let's
@@ -1074,11 +1074,12 @@ class QLearning(MDP):
         self.epsilon = _np.clip(epsilon, 0., 1.)
         self.epsilon_decay = _np.clip(epsilon_decay, 0., 1.)
         self.epsilon_min = _np.clip(epsilon_min, 0., 1.)
+        self.verbose = verbose
 
         # Initialisations
         self.Q = _np.zeros((self.S, self.A))
         self.run_stats = []
-        self.cum_reward = 0
+        self.rewards = []
 
     def run(self):
 
@@ -1123,7 +1124,7 @@ class QLearning(MDP):
                 except IndexError:
                     r = self.R[s]
 
-            self.cum_reward += r
+            self.rewards.append(r)
 
             # Q[s, a] = Q[s, a] + alpha*(R + gamma*Max[Q(s’, A)] - Q[s, a])
             # Updating the value of Q
@@ -1165,9 +1166,10 @@ class QLearning(MDP):
                 if self.epsilon < self.epsilon_min:
                     self.epsilon = self.epsilon_min
 
-            if n % 1000 == 0:
-                print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tAvg Delta:{d}\tTotal Reward:{r}'.format(n=n, a=round(self.alpha, 5), e=round(self.epsilon, 5), d=round(_np.mean(self.deltas[-1000:]), 5),
-                                                                                              r=self.cum_reward))
+            if n % 1000 == 0 and self.verbose:
+                print('N:{n}\tAlpha:{a}\tEpsilon:{e}\tAvg Delta:{d}\tMoving Sum Reward:{r}'.format(n=n, a=round(self.alpha, 5), e=round(self.epsilon, 5),
+                                                                                                   d=round(_np.mean(self.deltas[-10000:]), 5),
+                                                                                                   r=round(_np.sum(self.rewards[-10000:])))
 
         self._endRun()
         return self.run_stats
