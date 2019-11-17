@@ -1046,7 +1046,7 @@ class QLearning(MDP):
     def __init__(self, transitions, reward, gamma,
                  alpha=0.1, alpha_decay=0.99, alpha_min=0.1,
                  epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.99,
-                 n_iter=10000, seed=100, reinitialization=100, skip_check=False, verbose=False):
+                 n_iter=10000, seed=100, threshold=0.00001, reinitialization=100, skip_check=False, verbose=False):
         # Initialise a Q-learning MDP.
 
         # The following check won't be done in MDP()'s initialisation, so let's
@@ -1074,6 +1074,7 @@ class QLearning(MDP):
         self.epsilon = _np.clip(epsilon, 0., 1.)
         self.epsilon_decay = _np.clip(epsilon_decay, 0., 1.)
         self.epsilon_min = _np.clip(epsilon_min, 0., 1.)
+        self.threshold = threshold
         self.reinitialization = reinitialization
         self.verbose = verbose
 
@@ -1174,6 +1175,10 @@ class QLearning(MDP):
             # reset rewards list to save memory
             if n % 10000 == 0:
                 self.rewards = []
+
+            # check for convergence
+            if _np.mean(self.deltas[-10000:]) < self.threshold:
+                break
                 
 
         self._endRun()
